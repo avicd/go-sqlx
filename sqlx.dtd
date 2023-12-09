@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!ELEMENT mapper (resultMap* | sql* | insert* | update* | delete* | select* )+>
+<!ATTLIST mapper
+namespace CDATA #REQUIRED
+>
+
+<!ELEMENT resultMap (result*)>
+<!ATTLIST resultMap
+id CDATA #REQUIRED
+extends CDATA #IMPLIED
+>
+
+<!ELEMENT result EMPTY>
+<!ATTLIST result
+column CDATA #REQUIRED
+property CDATA #REQUIRED
+>
+
+<!ELEMENT property EMPTY>
+<!ATTLIST property
+name CDATA #REQUIRED
+value CDATA #REQUIRED
+>
+
+<!ELEMENT select (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST select
+id CDATA #REQUIRED
+args CDATA #IMPLIED
+resultMap CDATA #IMPLIED
+useCache (true|false) #IMPLIED
+databaseId CDATA #IMPLIED
+>
+
+<!ELEMENT insert (#PCDATA | selectSet | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST insert
+id CDATA #REQUIRED
+args CDATA #IMPLIED
+keyProp CDATA #IMPLIED
+databaseId CDATA #IMPLIED
+>
+
+<!ELEMENT selectSet (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST selectSet
+id CDATA #REQUIRED
+target (ARG|RESULT|CONTEXT) #REQUIRED
+args CDATA #IMPLIED
+ref CDATA #IMPLIED
+bind CDATA #IMPLIED
+keyProp CDATA #IMPLIED
+resultMap CDATA #IMPLIED
+databaseId CDATA #IMPLIED
+>
+
+<!ELEMENT update (#PCDATA | selectSet | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST update
+id CDATA #REQUIRED
+args CDATA #IMPLIED
+databaseId CDATA #IMPLIED
+>
+
+<!ELEMENT delete (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST delete
+id CDATA #REQUIRED
+args CDATA #IMPLIED
+databaseId CDATA #IMPLIED
+>
+
+<!-- Dynamic -->
+
+<!ELEMENT include (property+)?>
+<!ATTLIST include
+ref CDATA #REQUIRED
+>
+
+<!ELEMENT bind EMPTY>
+<!ATTLIST bind
+name CDATA #REQUIRED
+value CDATA #REQUIRED
+>
+
+<!ELEMENT sql (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST sql
+id CDATA #REQUIRED
+lang CDATA #IMPLIED
+databaseId CDATA #IMPLIED
+>
+
+<!ELEMENT trim (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST trim
+prefix CDATA #IMPLIED
+prefixOverrides CDATA #IMPLIED
+suffix CDATA #IMPLIED
+suffixOverrides CDATA #IMPLIED
+>
+<!ELEMENT where (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ELEMENT set (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+
+<!ELEMENT foreach (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST foreach
+collection CDATA #REQUIRED
+item CDATA #IMPLIED
+index CDATA #IMPLIED
+open CDATA #IMPLIED
+close CDATA #IMPLIED
+separator CDATA #IMPLIED
+>
+
+<!ELEMENT choose (when* , otherwise?)>
+<!ELEMENT when (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST when
+test CDATA #REQUIRED
+>
+<!ELEMENT otherwise (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+
+<!ELEMENT if (#PCDATA | include | trim | where | set | foreach | choose | if | bind)*>
+<!ATTLIST if
+test CDATA #REQUIRED
+>
+
+

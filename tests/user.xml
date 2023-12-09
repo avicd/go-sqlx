@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//github.com//avicd//DTD Mapper 3.0//EN"
+        "https://raw.githubusercontent.com/avicd/go-sqlx/main/sqlx.dtd">
+<mapper namespace="github.com.avicd.go-sqlx.tests.UserDao">
+
+    <select id="FindById" args="id">
+        select * from user where id = #{id}
+    </select>
+
+    <insert id="Insert" keyProp="Id">
+        insert into user(name,real_name,age,comment) values(#{Name},#{RealName},#{Age},#{Comment})
+    </insert>
+
+    <update id="UpdateById">
+        update user set
+        <trim suffixOverrides=",">
+            <if test="Name!=''">
+                name=#{Name},
+            </if>
+            <if test="RealName!=''">
+                real_name=#{RealName},
+            </if>
+            <if test="Age>0">
+                age=#{Age},
+            </if>
+            <if test="Comment!=''">
+                comment=#{Comment},
+            </if>
+        </trim>
+        where id = #{Id}
+    </update>
+
+    <delete id="DeleteById" args="id">
+        delete from user where id = #{id}
+    </delete>
+
+</mapper>
