@@ -15,46 +15,47 @@ type Session struct {
 	txs     []*sql.Tx
 	cons    []*sql.Conn
 	stmts   []*sql.Stmt
-	dbProxy map[*sql.DB]DBProxy
+	proxyDB map[*sql.DB]ProxyDB
 	closed  bool
 }
 
-type DBProxy interface {
+type ProxyDB interface {
 	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 	QueryContext(ctx context.Context, query string, args ...interface{}) (*sql.Rows, error)
 	QueryRowContext(ctx context.Context, query string, args ...interface{}) *sql.Row
 }
 
-func (it *Session) getDBProxy(stmt *Stmt) (DBProxy, error) {
-	if it.dbProxy == nil {
-		it.dbProxy = map[*sql.DB]DBProxy{}
+func (it *Session) getProxyDB(stmt *Stmt) (ProxyDB, error) {
+	if it.proxyDB == nil {
+		it.proxyDB = map[*sql.DB]ProxyDB{}
 	}
-	if db, ok := it.dbProxy[stmt.DB()]; ok {
+	if db, ok := it.proxyDB[stmt.DB()]; ok {
 		return db, nil
 	}
 	conn, err := stmt.DB().Conn(it.ctx)
 	if err != nil {
 		return nil, err
 	}
-	var db DBProxy
+	it.cons = append(it.cons, conn)
+	var proxy ProxyDB
 	if it.txOn {
 		tx, err1 := conn.BeginTx(it.ctx, it.txOpts)
 		if err1 != nil {
 			return nil, err1
 		}
-		it.dbProxy[stmt.DB()] = tx
+		it.proxyDB[stmt.DB()] = tx
 		it.txs = append(it.txs, tx)
-		db = tx
+		proxy = tx
 	} else {
-		it.dbProxy[stmt.DB()] = conn
-		db = conn
+		it.proxyDB[stmt.DB()] = conn
+		proxy = conn
 	}
-	return db, nil
+	return proxy, nil
 }
 
 func (it *Session) prepare(stmt *Stmt, sql string) (*sql.Stmt, error) {
-	proxy, err := it.getDBProxy(stmt)
+	proxy, err := it.getProxyDB(stmt)
 	if err != nil {
 		return nil, err
 	}
